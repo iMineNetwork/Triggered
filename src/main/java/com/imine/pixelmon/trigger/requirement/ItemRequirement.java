@@ -26,7 +26,7 @@ public class ItemRequirement implements Requirement {
 
     @Override
     public boolean entityMeetsRequirement(Entity entity) {
-        if(entity instanceof Player) {
+        if (entity instanceof Player) {
             Player player = ((Player) entity);
             return (player.getInventory().query(Sponge.getGame().getRegistry().getType(ItemType.class, itemType)) != null);
         }

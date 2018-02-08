@@ -7,6 +7,9 @@ import java.util.List;
 
 public class Trigger {
 
+    //The ID of the Trigger. Used for storing if a player has triggered it already
+    private String id;
+
     //Triggers will be activated once at least one of these conditions has been met.
     private List<Condition> conditions;
     //All these actions will occur when the trigger activates
@@ -17,10 +20,18 @@ public class Trigger {
     public Trigger() {
     }
 
-    public Trigger(List<Condition> conditions, List<Action> actions, Interval repeat) {
+    public Trigger(String id, List<Condition> conditions, List<Action> actions, Interval repeat) {
         this.conditions = conditions;
         this.actions = actions;
         this.repeat = repeat;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public List<Condition> getConditions() {
@@ -50,7 +61,8 @@ public class Trigger {
     @Override
     public String toString() {
         return "Trigger{" +
-                "conditions=" + conditions +
+                "id='" + id + '\'' +
+                ", conditions=" + conditions +
                 ", actions=" + actions +
                 ", repeat=" + repeat +
                 '}';

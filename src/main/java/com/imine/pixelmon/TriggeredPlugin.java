@@ -8,7 +8,7 @@ import org.spongepowered.api.plugin.Plugin;
 
 import java.nio.file.Path;
 
-@Plugin(id="triggered", name = "Triggered", version = "1.0")
+@Plugin(id = "triggered", name = "Triggered", version = "1.0")
 public class TriggeredPlugin {
 
     private final Path configPath;
