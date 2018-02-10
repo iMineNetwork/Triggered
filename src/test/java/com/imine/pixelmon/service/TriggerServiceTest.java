@@ -31,20 +31,20 @@ public class TriggerServiceTest {
 
     @Test
     public void getTriggers() throws Exception {
-        List<Trigger> triggers = testTriggerService.getAll();
+        List<Trigger> triggers = testTriggerService.loadAll();
         triggers.forEach(System.out::println);
     }
 
     @Test
     public void testSaveTriggers() throws Exception {
-        testTriggerService.getAll();
+        testTriggerService.loadAll();
 
-        List<Trigger> triggerList = Arrays.asList(
-                new Trigger("Route 1 Pokéblock", Collections.singletonList(new AreaCondition(new AABB(new Vector3d(0, 1, 2), new Vector3d(4, 5, 6)), "Pixelmon_Overworld")), Collections.singletonList(new LogAction("Logging Action for entity {}")), Interval.ONCE),
-                new Trigger("Mount Moon Team Rocket", Collections.singletonList(new AreaCondition(new AABB(new Vector3d(16, 123, 8), new Vector3d(163, 10, 100)), "Pixelmon_Interior")), Collections.singletonList(new CommandAction("/tp")), Interval.ALWAYS)
-        );
+        testTriggerService.add(new Trigger("Route 1 block until receive pokémon", Collections.singletonList(new AreaCondition(new AABB(new Vector3d(-11, 110, -23), new Vector3d(-7, 112, -24)), "Pixelmon_Overworld")), Collections.singletonList(new LogAction("Logging Action for entity {}")), Interval.ONCE));
+        testTriggerService.add(new Trigger("Mount Moon Team Rocket", Collections.singletonList(new AreaCondition(new AABB(new Vector3d(16, 123, 8), new Vector3d(163, 10, 100)), "Pixelmon_Interior")), Collections.singletonList(new CommandAction("/tp")), Interval.ALWAYS));
 
-        testTriggerService.saveAll(triggerList);
+        System.out.println(testTriggerService.loadAll());
+
+        Files.readAllLines(tempFolder.resolve("testStoragePath.json")).forEach(System.out::println);
     }
 
 }

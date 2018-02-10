@@ -28,7 +28,7 @@ public class LogAction implements Action {
 
     @Override
     public void perform(Entity entity) {
-        logger.debug(logMessage, entity.get(Keys.DISPLAY_NAME));
+        logger.info(logMessage, entity.get(Keys.DISPLAY_NAME));
     }
 
     @Override
