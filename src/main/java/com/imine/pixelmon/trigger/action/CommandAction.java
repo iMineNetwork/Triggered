@@ -1,9 +1,18 @@
 package com.imine.pixelmon.trigger.action;
 
+import org.apache.commons.lang3.text.StrSubstitutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.living.player.Player;
 
-public class CommandAction implements Action {
+import java.util.HashMap;
+import java.util.Map;
+
+public class CommandAction extends ContextAction {
+
+    private static final Logger logger = LoggerFactory.getLogger(CommandAction.class);
 
     private String command;
 
@@ -19,8 +28,11 @@ public class CommandAction implements Action {
     }
 
     @Override
-    public void perform(Entity entity) {
-        Sponge.getGame().getCommandManager().process(Sponge.getServer().getConsole(), command);
+    public void perform(Player player) {
+        String preparedCommand = StrSubstitutor.replace(command, buildContext(player));
+        logger.info("Running command '{}' for player '{}'", command, player.getName());
+        logger.info("Command resolved to '{}'", preparedCommand);
+        Sponge.getGame().getCommandManager().process(Sponge.getServer().getConsole(), preparedCommand);
     }
 
     @Override
