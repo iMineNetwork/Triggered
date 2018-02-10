@@ -1,5 +1,6 @@
 package com.imine.pixelmon.trigger.condition;
 
+import com.flowpowered.math.vector.Vector3d;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.util.AABB;
@@ -20,9 +21,11 @@ public class AreaCondition extends Condition {
         this.worldName = worldName;
     }
 
-    public boolean isInArea(Entity entity) {
+    public boolean isInArea(Vector3d vector3d) {
         Optional<World> oWorld = Sponge.getServer().getWorld(this.worldName);
-        return oWorld.map(world -> world.getIntersectingEntities(area).contains(entity)).orElse(false);
+        return area.contains(vector3d)
+                && oWorld.isPresent()
+                && oWorld.get().getName().equalsIgnoreCase(worldName);
     }
 
     public AABB getArea() {

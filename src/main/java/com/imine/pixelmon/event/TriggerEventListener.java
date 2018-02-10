@@ -26,18 +26,20 @@ public class TriggerEventListener {
     public void onEntityMove(MoveEntityEvent moveEntityEvent) {
         if (moveEntityEvent.getTargetEntity() instanceof Player) {
             Player player = ((Player) moveEntityEvent.getTargetEntity());
-            for (Trigger trigger : triggerService.loadAll()) {
+            for (Trigger trigger : triggerService.getAll()) {
                 if (shouldTriggerRunForPlayer(trigger, player)) {
                     for (Condition condition : trigger.getConditions()) {
-                        if (condition.getRequirements().stream().allMatch(requirement -> requirement.entityMeetsRequirement(player))) {
-                            if (condition instanceof AreaCondition && ((AreaCondition) condition).isInArea(moveEntityEvent.getTargetEntity())) {
-                                for (Action action : trigger.getActions()) {
-                                    action.perform(player);
-                                    if(trigger.getRepeat().equals(Interval.ONCE)) {
-                                        playerTriggerActivationService.add(new PlayerTriggerActivation(player.getUniqueId(), trigger.getId()));
+                        if (condition instanceof AreaCondition) {
+                            if (condition.getRequirements().stream().allMatch(requirement -> requirement.entityMeetsRequirement(player))) {
+                                if (isEnteringTrigger((AreaCondition) condition, moveEntityEvent)) {
+                                    for (Action action : trigger.getActions()) {
+                                        action.perform(player);
+                                        if (trigger.getRepeat().equals(Interval.ONCE)) {
+                                            playerTriggerActivationService.add(new PlayerTriggerActivation(player.getUniqueId(), trigger.getId()));
+                                        }
                                     }
+                                    break;
                                 }
-                                break;
                             }
                         }
                     }
@@ -51,5 +53,17 @@ public class TriggerEventListener {
                 || playerTriggerActivationService.loadAll().stream()
                 .noneMatch(playerTriggerActivation -> playerTriggerActivation.getPlayerId().equals(player.getUniqueId())
                         && playerTriggerActivation.getTriggerId().equals(trigger.getId()));
+    }
+
+    /**
+     * Verifies that the Move event was triggered due to an player moving into an area instead of moving inside an area
+     *
+     * @param areaCondition   The AreaCondition to check the area of
+     * @param moveEntityEvent the Event to get the source and target position
+     * @return true if the player moves into the area and was not already inside it
+     */
+    private boolean isEnteringTrigger(AreaCondition areaCondition, MoveEntityEvent moveEntityEvent) {
+        return areaCondition.isInArea(moveEntityEvent.getToTransform().getPosition())
+                && !areaCondition.isInArea(moveEntityEvent.getFromTransform().getPosition());
     }
 }
