@@ -1,5 +1,6 @@
 package com.imine.pixelmon.event;
 
+import com.imine.pixelmon.model.PlayerTriggerActivation;
 import com.imine.pixelmon.service.PlayerTriggerActivationService;
 import com.imine.pixelmon.service.TriggerService;
 import com.imine.pixelmon.trigger.Interval;
@@ -28,15 +29,17 @@ public class TriggerEventListener {
             for (Trigger trigger : triggerService.loadAll()) {
                 if (shouldTriggerRunForPlayer(trigger, player)) {
                     for (Condition condition : trigger.getConditions()) {
-                        if (condition.getRequirements().stream().allMatch(requirement -> requirement.entityMeetsRequirement(moveEntityEvent.getTargetEntity()))) {
+                        if (condition.getRequirements().stream().allMatch(requirement -> requirement.entityMeetsRequirement(player))) {
                             if (condition instanceof AreaCondition && ((AreaCondition) condition).isInArea(moveEntityEvent.getTargetEntity())) {
                                 for (Action action : trigger.getActions()) {
-                                    action.perform(moveEntityEvent.getTargetEntity());
+                                    action.perform(player);
+                                    if(trigger.getRepeat().equals(Interval.ONCE)) {
+                                        playerTriggerActivationService.add(new PlayerTriggerActivation(player.getUniqueId(), trigger.getId()));
+                                    }
                                 }
                                 break;
                             }
                         }
-
                     }
                 }
             }
