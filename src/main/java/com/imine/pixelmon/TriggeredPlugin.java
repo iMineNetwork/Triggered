@@ -6,7 +6,10 @@ import com.imine.pixelmon.service.TriggerService;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
+import org.spongepowered.api.event.game.state.GameStoppedServerEvent;
+import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 
 import javax.inject.Inject;
@@ -27,11 +30,26 @@ public class TriggeredPlugin {
         startPlugin();
     }
 
-    public void startPlugin(){
+    @Listener
+    public void onServerStop(GameStoppingServerEvent event) {
+        stopPlugin();
+    }
+
+    @Listener
+    public void onGameReload(GameReloadEvent gre) {
+        stopPlugin();
+        startPlugin();
+    }
+
+    private void startPlugin(){
         triggerService = new TriggerService(configPath.resolve("triggers.json"));
         triggerService.loadAll();
         playerTriggerActivationService = new PlayerTriggerActivationService(configPath.resolve("trigger_activations.json"));
         playerTriggerActivationService.loadAll();
         Sponge.getGame().getEventManager().registerListeners(this, new TriggerEventListener(triggerService, playerTriggerActivationService));
+    }
+
+    private void stopPlugin() {
+        Sponge.getEventManager().unregisterPluginListeners(this);
     }
 }
