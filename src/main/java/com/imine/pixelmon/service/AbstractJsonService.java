@@ -16,6 +16,7 @@ import org.spongepowered.api.util.AABB;
 
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -50,6 +51,8 @@ public class AbstractJsonService<T> {
         try {
             Class clazz = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
             jsonListCache = createObjectMapper().readValue(Files.newInputStream(storagePath), objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
+//            Type type = ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+//            jsonListCache = createObjectMapper().readValue(Files.newInputStream(storagePath), objectMapper.getTypeFactory().constructCollectionType(List.class, type.getClass()));
         } catch (IOException e) {
             logger.error("Exception while while reading Json from {}. List will not be initialized to prevent overwriting storage to an empty file ({}: {})", storagePath.toAbsolutePath().toString(), e.getClass().getSimpleName(), e.getMessage());
         }

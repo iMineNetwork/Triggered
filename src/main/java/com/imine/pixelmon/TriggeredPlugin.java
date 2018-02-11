@@ -15,7 +15,7 @@ import org.spongepowered.api.plugin.Plugin;
 import javax.inject.Inject;
 import java.nio.file.Path;
 
-@Plugin(id = "triggered", name = "Triggered", version = "1.0")
+@Plugin(id = "triggered", name = "Triggered", version = "1.0", description = "Create events with Conditions and Actions")
 public class TriggeredPlugin {
 
     private TriggerService triggerService;
