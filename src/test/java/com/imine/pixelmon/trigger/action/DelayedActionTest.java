@@ -16,20 +16,20 @@ public class DelayedActionTest {
     public void testPerform() throws Exception {
         delayedAction.perform(null);
         Thread.sleep(60);
-        assertEquals(1, testAction.getInvokationCount());
+        assertEquals(1, testAction.getInvocationCount());
     }
 
     private static class TestAction implements Action {
 
-        private int invokationCount = 0;
+        private int invocationCount = 0;
 
         @Override
         public void perform(Player player) {
-            invokationCount++;
+            invocationCount++;
         }
 
-        public int getInvokationCount() {
-            return invokationCount;
+        public int getInvocationCount() {
+            return invocationCount;
         }
     }
 }
