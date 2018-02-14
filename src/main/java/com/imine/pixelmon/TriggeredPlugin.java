@@ -8,7 +8,6 @@ import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
-import org.spongepowered.api.event.game.state.GameStoppedServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 
@@ -42,7 +41,7 @@ public class TriggeredPlugin {
     }
 
     private void startPlugin(){
-        triggerService = new TriggerService(configPath.resolve("triggers.json"));
+        triggerService = new TriggerService(configPath.resolve("triggers"));
         triggerService.loadAll();
         playerTriggerActivationService = new PlayerTriggerActivationService(configPath.resolve("trigger_activations.json"));
         playerTriggerActivationService.loadAll();

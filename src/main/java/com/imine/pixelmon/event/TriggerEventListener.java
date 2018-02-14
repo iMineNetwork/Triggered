@@ -30,7 +30,7 @@ public class TriggerEventListener {
                 if (shouldTriggerRunForPlayer(trigger, player)) {
                     for (Condition condition : trigger.getConditions()) {
                         if (condition instanceof AreaCondition) {
-                            if (condition.getRequirements().stream().allMatch(requirement -> requirement.meetsRequirement(player))) {
+                            if (condition.getRequirements() == null || condition.getRequirements().stream().allMatch(requirement -> requirement.meetsRequirement(player))) {
                                 if (isEnteringTrigger((AreaCondition) condition, moveEntityEvent)) {
                                     for (Action action : trigger.getActions()) {
                                         action.perform(player);
