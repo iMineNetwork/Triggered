@@ -1,22 +1,25 @@
 package com.imine.pixelmon.trigger.condition;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.flowpowered.math.vector.Vector3d;
+import com.imine.pixelmon.trigger.requirement.Requirement;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.world.World;
 
+import java.util.List;
 import java.util.Optional;
 
 public class AreaCondition extends Condition {
 
-    private AABB area;
-    private String worldName;
+    private final AABB area;
+    private final String worldName;
 
-    public AreaCondition() {
-    }
-
-    public AreaCondition(AABB area, String worldName) {
+    @JsonCreator
+    public AreaCondition(@JsonProperty("requirements") List<Requirement> requirements, @JsonProperty("area") AABB area, @JsonProperty("worldName") String worldName) {
+        super(requirements);
         this.area = area;
         this.worldName = worldName;
     }
@@ -32,16 +35,8 @@ public class AreaCondition extends Condition {
         return area;
     }
 
-    public void setArea(AABB area) {
-        this.area = area;
-    }
-
     public String getWorld() {
         return worldName;
-    }
-
-    public void setWorld(String worldName) {
-        this.worldName = worldName;
     }
 
     @Override

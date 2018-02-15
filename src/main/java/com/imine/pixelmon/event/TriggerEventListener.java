@@ -8,8 +8,10 @@ import com.imine.pixelmon.trigger.Trigger;
 import com.imine.pixelmon.trigger.action.Action;
 import com.imine.pixelmon.trigger.condition.AreaCondition;
 import com.imine.pixelmon.trigger.condition.Condition;
+import com.imine.pixelmon.trigger.condition.EntityInteractCondition;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 
 public class TriggerEventListener {
@@ -30,7 +32,7 @@ public class TriggerEventListener {
                 if (shouldTriggerRunForPlayer(trigger, player)) {
                     for (Condition condition : trigger.getConditions()) {
                         if (condition instanceof AreaCondition) {
-                            if (condition.getRequirements().stream().allMatch(requirement -> requirement.meetsRequirement(player))) {
+                            if (condition.matchesRequirements(player)) {
                                 if (isEnteringTrigger((AreaCondition) condition, moveEntityEvent)) {
                                     for (Action action : trigger.getActions()) {
                                         action.perform(player);
@@ -46,6 +48,24 @@ public class TriggerEventListener {
                 }
             }
         }
+    }
+
+    @Listener
+    public void onEntityInteract(InteractEntityEvent interactEntityEvent) {
+        interactEntityEvent.getCause().first(Player.class).ifPresent(player -> {
+            triggerService.getAll()
+                    .forEach(trigger -> trigger.getConditions().stream()
+                            .filter(EntityInteractCondition.class::isInstance)
+                            .map(EntityInteractCondition.class::cast)
+                            .forEach(condition -> {
+                                if (condition.entityMatches(interactEntityEvent.getTargetEntity()) && condition.matchesRequirements(player)) {
+                                    trigger.getActions().forEach(action -> action.perform(player));
+                                    if (trigger.getRepeat().equals(Interval.ONCE)) {
+                                        playerTriggerActivationService.add(new PlayerTriggerActivation(player.getUniqueId(), trigger.getId()));
+                                    }
+                                }
+                            }));
+        });
     }
 
     private boolean shouldTriggerRunForPlayer(Trigger trigger, Player player) {
