@@ -23,7 +23,7 @@ public abstract class Condition {
     }
 
     public boolean matchesRequirements(Player player) {
-        return requirements.parallelStream().allMatch(requirement -> requirement.meetsRequirement(player));
+        return requirements != null && requirements.parallelStream().allMatch(requirement -> requirement.meetsRequirement(player));
     }
 
 }
