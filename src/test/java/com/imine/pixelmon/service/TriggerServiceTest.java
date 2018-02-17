@@ -8,6 +8,7 @@ import com.imine.pixelmon.trigger.action.DialogueAction;
 import com.imine.pixelmon.trigger.action.LogAction;
 import com.imine.pixelmon.trigger.condition.AreaCondition;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.spongepowered.api.util.AABB;
 
@@ -38,6 +39,7 @@ public class TriggerServiceTest {
     }
 
     @Test
+    @Ignore
     public void testSaveTriggers() throws Exception {
         testTriggerService.loadAll();
 
