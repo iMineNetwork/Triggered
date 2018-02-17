@@ -54,6 +54,7 @@ public class AbstractJsonService<T> {
                         jsonListCache.addAll(createObjectMapper().readValue(Files.newInputStream(path), objectMapper.getTypeFactory().constructCollectionType(List.class, clazz)));
                     } catch (IOException e) {
                         logger.warn("Failed to load file ''. Reason: ({} : {})", path.toAbsolutePath().toString(), e.getClass().getSimpleName(), e.getMessage());
+                        e.printStackTrace();
                     }
                 });
             }

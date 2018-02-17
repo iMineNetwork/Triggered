@@ -17,6 +17,8 @@ import java.nio.file.Path;
 @Plugin(id = "triggered", name = "Triggered", version = "1.0", description = "Create events with Conditions and Actions")
 public class TriggeredPlugin {
 
+    private static Object pluginInstance;
+
     private TriggerService triggerService;
     private PlayerTriggerActivationService playerTriggerActivationService;
 
@@ -41,6 +43,7 @@ public class TriggeredPlugin {
     }
 
     private void startPlugin(){
+        setPluginInstance(this);
         triggerService = new TriggerService(configPath.resolve("triggers"));
         triggerService.loadAll();
         playerTriggerActivationService = new PlayerTriggerActivationService(configPath.resolve("trigger_activations.json"));
@@ -50,5 +53,14 @@ public class TriggeredPlugin {
 
     private void stopPlugin() {
         Sponge.getEventManager().unregisterPluginListeners(this);
+        setPluginInstance(null);
+    }
+
+    public static Object getPluginInstance() {
+        return pluginInstance;
+    }
+
+    public static void setPluginInstance(Object pluginInstance) {
+        TriggeredPlugin.pluginInstance = pluginInstance;
     }
 }

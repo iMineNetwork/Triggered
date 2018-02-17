@@ -4,11 +4,7 @@ import org.apache.commons.lang3.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class CommandAction extends ContextAction {
 

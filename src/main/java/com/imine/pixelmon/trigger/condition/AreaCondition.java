@@ -15,20 +15,20 @@ import java.util.Optional;
 public class AreaCondition extends Condition {
 
     private final AABB area;
-    private final String worldName;
+    private final String world;
 
     @JsonCreator
-    public AreaCondition(@JsonProperty("requirements") List<Requirement> requirements, @JsonProperty("area") AABB area, @JsonProperty("worldName") String worldName) {
+    public AreaCondition(@JsonProperty("requirements") List<Requirement> requirements, @JsonProperty("area") AABB area, @JsonProperty("world") String world) {
         super(requirements);
         this.area = area;
-        this.worldName = worldName;
+        this.world = world;
     }
 
     public boolean isInArea(Vector3d vector3d) {
-        Optional<World> oWorld = Sponge.getServer().getWorld(this.worldName);
+        Optional<World> oWorld = Sponge.getServer().getWorld(world);
         return area.contains(vector3d)
                 && oWorld.isPresent()
-                && oWorld.get().getName().equalsIgnoreCase(worldName);
+                && oWorld.get().getName().equalsIgnoreCase(world);
     }
 
     public AABB getArea() {
@@ -36,14 +36,14 @@ public class AreaCondition extends Condition {
     }
 
     public String getWorld() {
-        return worldName;
+        return world;
     }
 
     @Override
     public String toString() {
         return "AreaCondition{" +
                 "area=" + area +
-                ", worldName=" + worldName +
+                ", worldName=" + world +
                 '}';
     }
 }
