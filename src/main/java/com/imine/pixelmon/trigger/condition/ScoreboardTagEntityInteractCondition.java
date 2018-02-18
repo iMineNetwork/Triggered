@@ -15,7 +15,8 @@ import java.util.Optional;
 public class ScoreboardTagEntityInteractCondition extends EntityInteractCondition {
 
     private static final Logger logger = LoggerFactory.getLogger(ScoreboardTagEntityInteractCondition.class);
-    public static final String UNSAFE_DATA = "UnsafeData";
+    public static final String NBT_UNSAFE_DATA = "UnsafeData";
+    public static final String NBT_SCOREBOARD_TAGS = "Tags";
 
     private final String tag;
 
@@ -31,10 +32,10 @@ public class ScoreboardTagEntityInteractCondition extends EntityInteractConditio
 
     @Override
     public boolean entityMatches(Entity entity) {
-        Optional<Object> oDataView = entity.toContainer().get(DataQuery.of(UNSAFE_DATA));
+        Optional<Object> oDataView = entity.toContainer().get(DataQuery.of(NBT_UNSAFE_DATA));
         if(oDataView.isPresent()) {
             DataView dataView = (DataView) oDataView.get();
-            Optional<List<?>> oTagList = dataView.getList(DataQuery.of("Tags"));
+            Optional<List<?>> oTagList = dataView.getList(DataQuery.of(NBT_SCOREBOARD_TAGS));
             if(oTagList.isPresent()) {
                 List<?> tagList = oTagList.get();
                 return tagList.contains(tag);
