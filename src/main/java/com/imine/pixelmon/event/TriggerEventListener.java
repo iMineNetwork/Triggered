@@ -7,10 +7,12 @@ import com.imine.pixelmon.trigger.Interval;
 import com.imine.pixelmon.trigger.Trigger;
 import com.imine.pixelmon.trigger.action.Action;
 import com.imine.pixelmon.trigger.condition.AreaCondition;
+import com.imine.pixelmon.trigger.condition.BlockInteractCondition;
 import com.imine.pixelmon.trigger.condition.Condition;
 import com.imine.pixelmon.trigger.condition.EntityInteractCondition;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 
@@ -59,6 +61,24 @@ public class TriggerEventListener {
                             .map(EntityInteractCondition.class::cast)
                             .forEach(condition -> {
                                 if (condition.entityMatches(interactEntityEvent.getTargetEntity()) && condition.matchesRequirements(player)) {
+                                    trigger.getActions().forEach(action -> action.perform(player));
+                                    if (trigger.getRepeat().equals(Interval.ONCE)) {
+                                        playerTriggerActivationService.add(new PlayerTriggerActivation(player.getUniqueId(), trigger.getId()));
+                                    }
+                                }
+                            }));
+        });
+    }
+
+    @Listener
+    public void onEntityInteract(InteractBlockEvent interactBlockEvent) {
+        interactBlockEvent.getCause().first(Player.class).ifPresent(player -> {
+            triggerService.getAll()
+                    .forEach(trigger -> trigger.getConditions().stream()
+                            .filter(BlockInteractCondition.class::isInstance)
+                            .map(BlockInteractCondition.class::cast)
+                            .forEach(condition -> {
+                                if (condition.blockMatches(interactBlockEvent.getTargetBlock()) && condition.matchesRequirements(player)) {
                                     trigger.getActions().forEach(action -> action.perform(player));
                                     if (trigger.getRepeat().equals(Interval.ONCE)) {
                                         playerTriggerActivationService.add(new PlayerTriggerActivation(player.getUniqueId(), trigger.getId()));
