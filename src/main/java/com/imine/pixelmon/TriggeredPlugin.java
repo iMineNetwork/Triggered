@@ -3,6 +3,7 @@ package com.imine.pixelmon;
 import com.imine.pixelmon.event.TriggerEventListener;
 import com.imine.pixelmon.service.PlayerTriggerActivationService;
 import com.imine.pixelmon.service.TriggerService;
+import com.imine.pixelmon.trigger.requirement.TriggerActivationRequirement;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
@@ -48,6 +49,7 @@ public class TriggeredPlugin {
         triggerService.loadAll();
         playerTriggerActivationService = new PlayerTriggerActivationService(configPath.resolve("trigger_activations.json"));
         playerTriggerActivationService.loadAll();
+        TriggerActivationRequirement.setPlayerTriggerActivationService(playerTriggerActivationService);
         Sponge.getGame().getEventManager().registerListeners(this, new TriggerEventListener(triggerService, playerTriggerActivationService));
     }
 
