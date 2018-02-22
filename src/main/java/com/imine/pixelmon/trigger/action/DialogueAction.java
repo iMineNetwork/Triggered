@@ -2,6 +2,7 @@ package com.imine.pixelmon.trigger.action;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.imine.pixelmon.trigger.action.entry.DialogueEntry;
 import com.pixelmonmod.pixelmon.api.dialogue.Choice;
 import com.pixelmonmod.pixelmon.api.dialogue.Dialogue;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -36,23 +37,4 @@ public class DialogueAction extends ContextAction {
         Dialogue.setPlayerDialogueData((EntityPlayerMP) player, dialogueList, true);
     }
 
-    public static class DialogueEntry {
-
-        private final String name;
-        private final String message;
-
-        @JsonCreator
-        public DialogueEntry(@JsonProperty("name") String name, @JsonProperty("message") String message) {
-            this.name = name;
-            this.message = message;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-    }
 }
