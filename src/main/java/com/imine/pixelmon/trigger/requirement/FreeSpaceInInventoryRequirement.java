@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.Optional;
 
@@ -27,16 +28,8 @@ public class FreeSpaceInInventoryRequirement implements Requirement {
     @Override
     public boolean meetsRequirement(Player player) {
         int freeSlots = 0;
-
-        player.getInventory().peek();
-
-
         for (Inventory slot : player.getInventory().slots()) {
-            if (slot.peek().isPresent()) {
-                if (slot.peek().equals(Optional.empty()) || slot.peek().get().getItem() == ItemTypes.NONE) {
-                    freeSlots++;
-                }
-            } else {
+            if (slot.peek().map(ItemStack::getItem).orElse(ItemTypes.NONE).equals(ItemTypes.NONE)) {
                 freeSlots++;
             }
         }
