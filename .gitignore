@@ -5,4 +5,7 @@ lib/
 build/
 
 *.iml
+*.ipr
+*.iws
 testStoragePath.json
+gradle.properties

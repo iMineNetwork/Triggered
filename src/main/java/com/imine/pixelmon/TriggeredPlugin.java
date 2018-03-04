@@ -1,9 +1,11 @@
 package com.imine.pixelmon;
 
+import com.imine.pixelmon.event.PixelmonListener;
 import com.imine.pixelmon.event.TriggerEventListener;
 import com.imine.pixelmon.service.PlayerTriggerActivationService;
 import com.imine.pixelmon.service.TriggerService;
 import com.imine.pixelmon.trigger.requirement.TriggerActivationRequirement;
+import com.pixelmonmod.pixelmon.Pixelmon;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
@@ -20,6 +22,7 @@ public class TriggeredPlugin {
 
     private static Object pluginInstance;
 
+    private PixelmonListener pixelmonListener;
     private TriggerService triggerService;
     private PlayerTriggerActivationService playerTriggerActivationService;
 
@@ -43,7 +46,7 @@ public class TriggeredPlugin {
         startPlugin();
     }
 
-    private void startPlugin(){
+    private void startPlugin() {
         setPluginInstance(this);
         triggerService = new TriggerService(configPath.resolve("triggers"));
         triggerService.loadAll();
@@ -51,9 +54,12 @@ public class TriggeredPlugin {
         playerTriggerActivationService.loadAll();
         TriggerActivationRequirement.setPlayerTriggerActivationService(playerTriggerActivationService);
         Sponge.getGame().getEventManager().registerListeners(this, new TriggerEventListener(triggerService, playerTriggerActivationService));
+        pixelmonListener = new PixelmonListener(triggerService, playerTriggerActivationService);
+        Pixelmon.EVENT_BUS.register(pixelmonListener);
     }
 
     private void stopPlugin() {
+        Pixelmon.EVENT_BUS.unregister(pixelmonListener);
         Sponge.getEventManager().unregisterPluginListeners(this);
         setPluginInstance(null);
     }

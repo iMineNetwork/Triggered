@@ -1,15 +1,28 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven { url = "http://files.minecraftforge.net/maven" }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+    }
+}
+
 plugins {
     id 'com.github.johnrengelman.shadow' version '2.0.2'
     id 'java'
+    id 'net.minecraftforge.gradle.forge' version '2.0.2'
 }
 
-group = 'nl.imine'
+group = 'nl.imine.pixelmon.Triggered'
+archivesBaseName = "Triggered"
 version = '1.0-SNAPSHOT'
 
 description = """"""
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+compileJava {
+    sourceCompatibility = targetCompatibility = '1.8'
+}
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
@@ -20,16 +33,19 @@ shadowJar {
 }
 
 configurations {
-    compile.extendsFrom shadow
+    shade
+    compile.extendsFrom shade
 }
 
 shadowJar {
     dependencies {
-        include(dependency('com.fasterxml.jackson.core:jackson-core:2.8.9'))
-        include(dependency('com.fasterxml.jackson.core:jackson-databind:2.8.9'))
-        include(dependency('com.fasterxml.jackson.core:jackson-annotations:2.8.9'))
-        include(dependency('com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.8.9'))
+        include dependency('com.fasterxml.jackson.core:jackson-core')
+        include dependency('com.fasterxml.jackson.core:jackson-databind')
+        include dependency('com.fasterxml.jackson.core:jackson-annotations')
+        include dependency('com.fasterxml.jackson.datatype:jackson-datatype-jdk8')
     }
+
+    relocate 'com.fasterxml.jackson', 'com.imine.pixelmon.jackson'
 }
 
 repositories {
@@ -52,4 +68,39 @@ dependencies {
 }
 
 build.dependsOn(shadowJar)
-jar.enabled = false
+
+processResources {
+    // this will ensure that this task is redone when the versions change.
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    // replace stuff in mcmod.info, nothing else
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+
+        // replace version and mcversion
+        expand 'version':project.version, 'mcversion':project.minecraft.version
+    }
+
+    // copy everything else except the mcmod.info
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
+
+minecraft {
+    version = "1.12.2-14.23.2.2619"
+    runDir = "run"
+
+    // the mappings can be changed at any time, and must be in the following format.
+    // snapshot_YYYYMMDD   snapshot are built nightly.
+    // stable_#            stables are built at the discretion of the MCP team.
+    // Use non-default mappings at your own risk. they may not always work.
+    // simply re-run your setup task after changing the mappings to update your workspace.
+    mappings = "snapshot_20171003"
+    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+}
+
+reobf {
+    shadowJar {} // Reobfuscate the shadowed JAR
+}
