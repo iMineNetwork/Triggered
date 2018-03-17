@@ -53,7 +53,7 @@ public class AbstractJsonService<T> {
                     try {
                         jsonListCache.addAll(createObjectMapper().readValue(Files.newInputStream(path), objectMapper.getTypeFactory().constructCollectionType(List.class, clazz)));
                     } catch (IOException e) {
-                        logger.warn("Failed to load file ''. Reason: ({} : {})", path.toAbsolutePath().toString(), e.getClass().getSimpleName(), e.getMessage());
+                        logger.warn("Failed to load file '{}'. Reason: ({} : {})", path.toAbsolutePath().toString(), e.getClass().getSimpleName(), e.getMessage());
                         e.printStackTrace();
                     }
                 });
@@ -91,6 +91,7 @@ public class AbstractJsonService<T> {
             objectMapper = new ObjectMapper();
             objectMapper.enable(JsonGenerator.Feature.IGNORE_UNKNOWN);
             objectMapper.enable(JsonParser.Feature.IGNORE_UNDEFINED);
+            objectMapper.enable(JsonParser.Feature.ALLOW_MISSING_VALUES);
             objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
             SimpleModule module = new SimpleModule();
             module.addSerializer(Vector3d.class, new Vector3dSerializer());
