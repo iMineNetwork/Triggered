@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.flowpowered.math.vector.Vector3d;
 import com.imine.pixelmon.json.*;
+import net.minecraft.network.play.server.SPacketSoundEffect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.api.util.AABB;
@@ -24,7 +25,7 @@ public class AbstractJsonService<T> {
 
     private static Logger logger = LoggerFactory.getLogger(AbstractJsonService.class);
     private final Path storagePath;
-    T targetClass;
+    private T targetClass;
     private List<T> jsonListCache;
     private ObjectMapper objectMapper;
 
