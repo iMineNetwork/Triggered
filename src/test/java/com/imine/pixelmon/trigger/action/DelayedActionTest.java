@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 public class DelayedActionTest {
 
     private final TestAction testAction = new TestAction();
-    private DelayedAction delayedAction = new DelayedAction(Arrays.asList(testAction, new LogAction("Action!")), 50);
+    private DelayedAction delayedAction = new DelayedAction(Arrays.asList(testAction, new LogAction("Action!")), null, 50);
 
     @Test
     @Ignore
