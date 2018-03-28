@@ -56,6 +56,8 @@ public class TriggerEventListener {
     public void onEntityInteract(InteractEntityEvent interactEntityEvent) {
         interactEntityEvent.getCause().first(Player.class).ifPresent(player -> {
             triggerService.getAll()
+                    .stream()
+                    .filter(t -> shouldTriggerRunForPlayer(t, player))
                     .forEach(trigger -> trigger.getConditions().stream()
                             .filter(EntityInteractCondition.class::isInstance)
                             .map(EntityInteractCondition.class::cast)
@@ -74,9 +76,14 @@ public class TriggerEventListener {
     public void onEntityInteract(InteractBlockEvent interactBlockEvent) {
         interactBlockEvent.getCause().first(Player.class).ifPresent(player -> {
             triggerService.getAll()
-                    .forEach(trigger -> trigger.getConditions().stream()
+                    .stream()
+                    .filter(t -> shouldTriggerRunForPlayer(t, player))
+                    .forEach(trigger -> trigger.getConditions()
+                            .stream()
                             .filter(BlockInteractCondition.class::isInstance)
+
                             .map(BlockInteractCondition.class::cast)
+
                             .forEach(condition -> {
                                 if (condition.blockMatches(interactBlockEvent.getTargetBlock()) && condition.matchesRequirements(player)) {
                                     trigger.getActions().forEach(action -> action.perform(player));
