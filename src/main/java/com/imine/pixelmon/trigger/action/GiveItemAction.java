@@ -9,12 +9,10 @@ import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.sound.SoundType;
-import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -69,12 +67,22 @@ public class GiveItemAction implements Action {
         dialogueList.add(
                 Dialogue.builder()
                         .setName("")
-                        .setText("You received " + (startsWithVowel(itemType.getName()) ? "an " : "a " + itemType.getName()) + "!")
+                        .setText("You received " +
+                                (startsWithVowel(itemType.getName()) ? "an " : "a ") +
+
+                                //itemname without minecraft: or pixelmon:
+                                itemType.getName().substring(itemType.getName().indexOf(":") + 1)
+                                + "!")
                         .build()
         );
+
+        logger.info("Giving item '{}' to player '{}'", itemStack.getItem(), player.getName());
+
         Dialogue.setPlayerDialogueData((EntityPlayerMP) player, dialogueList, true);
         player.getInventory().offer(itemStack);
         player.playSound(sound, player.getLocation().getPosition(), 50, 1);
+
+        logger.info("Giving item {} was successful", itemType.getName());
     }
 
     private boolean startsWithVowel(String string) {
