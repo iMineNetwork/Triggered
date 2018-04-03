@@ -43,8 +43,12 @@ public class DelayedAction implements Action {
 
     @Override
     public void perform(Player player) {
-        if (requirements != null && requirements.stream().allMatch(requirement -> requirement.meetsRequirement(player))) {
-            Task.builder().delay(delayMs, TimeUnit.MILLISECONDS).execute(() -> actions.forEach(action -> action.perform(player))).submit(TriggeredPlugin.getPluginInstance());
-        }
+        Task.builder().delay(delayMs, TimeUnit.MILLISECONDS)
+                .execute(() -> actions.forEach(action -> {
+                    if (requirements == null || requirements.stream().allMatch(requirement -> requirement.meetsRequirement(player))) {
+                        action.perform(player);
+                    }
+                }))
+                .submit(TriggeredPlugin.getPluginInstance());
     }
 }

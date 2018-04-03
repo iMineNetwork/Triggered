@@ -12,6 +12,7 @@ import com.imine.pixelmon.trigger.condition.Condition;
 import com.imine.pixelmon.trigger.condition.EntityInteractCondition;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
@@ -26,7 +27,7 @@ public class TriggerEventListener {
         this.playerTriggerActivationService = playerTriggerActivationService;
     }
 
-    @Listener
+    @Listener(order = Order.LATE)
     public void onEntityMove(MoveEntityEvent moveEntityEvent) {
         if (moveEntityEvent.getTargetEntity() instanceof Player) {
             Player player = ((Player) moveEntityEvent.getTargetEntity());
