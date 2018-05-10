@@ -8,7 +8,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.flowpowered.math.vector.Vector3d;
 import com.imine.pixelmon.json.*;
-import net.minecraft.network.play.server.SPacketSoundEffect;
+import com.pixelmonmod.pixelmon.api.pokemon.PokemonSpec;
+import com.pixelmonmod.pixelmon.battles.attacks.Attack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.api.util.AABB;
@@ -20,12 +21,12 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 public class AbstractJsonService<T> {
 
     private static Logger logger = LoggerFactory.getLogger(AbstractJsonService.class);
     private final Path storagePath;
-    private T targetClass;
     private List<T> jsonListCache;
     private ObjectMapper objectMapper;
 
@@ -46,21 +47,23 @@ public class AbstractJsonService<T> {
         setUpFiles();
         try {
             Class clazz = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-            if (!Files.isDirectory(storagePath)) {
+            if (!storagePath.toFile().isDirectory()) {
                 jsonListCache = createObjectMapper().readValue(Files.newInputStream(storagePath), objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
             } else {
                 jsonListCache = new ArrayList<>();
-                Files.walk(storagePath).filter(path -> !Files.isDirectory(path)).forEach(path -> {
-                    try {
-                        jsonListCache.addAll(createObjectMapper().readValue(Files.newInputStream(path), objectMapper.getTypeFactory().constructCollectionType(List.class, clazz)));
-                    } catch (IOException e) {
-                        logger.warn("Failed to load file '{}'. Reason: ({} : {})", path.toAbsolutePath().toString(), e.getClass().getSimpleName(), e.getMessage());
-                        e.printStackTrace();
-                    }
-                });
+                try (Stream<Path> walk = Files.walk(storagePath)) {
+                    walk.filter(path -> !path.toFile().isDirectory()).forEach(path -> {
+                        try {
+                            jsonListCache.addAll(createObjectMapper().readValue(Files.newInputStream(path), objectMapper.getTypeFactory().constructCollectionType(List.class, clazz)));
+                        } catch (IOException e) {
+                            logger.warn("Failed to load file '{}'. Reason: ({} : {})", path.toAbsolutePath(), e.getClass().getSimpleName(), e.getMessage());
+                            e.printStackTrace();
+                        }
+                    });
+                }
             }
         } catch (IOException e) {
-            logger.error("Exception while while reading Json from {}. List will not be initialized to prevent overwriting storage to an empty file ({}: {})", storagePath.toAbsolutePath().toString(), e.getClass().getSimpleName(), e.getMessage());
+            logger.error("Exception while while reading Json from {}. List will not be initialized to prevent overwriting storage to an empty file ({}: {})", storagePath.toAbsolutePath(), e.getClass().getSimpleName(), e.getMessage());
         }
         return jsonListCache;
     }
@@ -72,7 +75,7 @@ public class AbstractJsonService<T> {
 
     private void saveAll() {
         setUpFiles();
-        Path savePath = Files.isDirectory(storagePath) ? storagePath.resolve("save.json") : storagePath;
+        Path savePath = storagePath.toFile().isDirectory() ? storagePath.resolve("save.json") : storagePath;
         if (jsonListCache != null) {
             try {
                 if (!savePath.toFile().exists()) {
@@ -80,7 +83,7 @@ public class AbstractJsonService<T> {
                 }
                 createObjectMapper().writeValue(Files.newOutputStream(savePath), jsonListCache);
             } catch (IOException e) {
-                logger.error("Exception while while saving Json to {} ({}: {})", savePath.toAbsolutePath().toString(), e.getClass().getSimpleName(), e.getMessage());
+                logger.error("Exception while while saving Json to {} ({}: {})", savePath.toAbsolutePath(), e.getClass().getSimpleName(), e.getMessage());
             }
         } else {
             logger.error("Cache was empty, not saving file to prevent possible data loss");
@@ -101,6 +104,8 @@ public class AbstractJsonService<T> {
             module.addDeserializer(AABB.class, new AABBDeserializer());
             module.addSerializer(UUID.class, new UUIDSerializer());
             module.addDeserializer(UUID.class, new UUIDDeserializer());
+            module.addDeserializer(Attack.class, new AttackDeserializer());
+            module.addDeserializer(PokemonSpec.class, new PokemonSpecDeserializer());
             objectMapper.registerModule(module);
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         }
@@ -109,12 +114,12 @@ public class AbstractJsonService<T> {
 
     public boolean setUpFiles() {
         try {
-            if (storagePath.toAbsolutePath().getParent() != null && !Files.exists(storagePath.toAbsolutePath().getParent())) {
+            if (storagePath.toAbsolutePath().getParent() != null && !storagePath.toAbsolutePath().getParent().toFile().exists()) {
                 Files.createDirectories(storagePath.toAbsolutePath().getParent());
             }
 
-            if (!Files.exists(storagePath)) {
-                if (Files.isDirectory(storagePath)) {
+            if (!storagePath.toFile().exists()) {
+                if (storagePath.toFile().isDirectory()) {
                     Files.createDirectory(storagePath);
                 } else {
                     Files.createFile(storagePath);

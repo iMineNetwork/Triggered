@@ -13,6 +13,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -33,11 +34,7 @@ public class GiveItemAction implements Action {
                           @JsonProperty("unbreakable") boolean unbreakable,
                           @JsonProperty("durability") int durability) {
 
-
-        logger.info("Creating item: {} {} {} {}", itemType, amount, unbreakable, durability);
-
         Optional<ItemType> oItemType = Sponge.getGame().getRegistry().getType(ItemType.class, itemType);
-        ItemType itemType1;
 
         this.amount = amount > 0 ? amount : 1;
         this.unbreakable = unbreakable;
@@ -47,7 +44,7 @@ public class GiveItemAction implements Action {
             this.itemType = oItemType.get();
         } else {
             this.itemType = ItemTypes.STICK;
-            logger.warn("No item found bu type " + itemType);
+            logger.warn("No item found with type " + itemType);
             return;
         }
 
@@ -60,29 +57,27 @@ public class GiveItemAction implements Action {
                 .itemType(itemType)
                 .quantity(amount)
                 .add(Keys.UNBREAKABLE, unbreakable)
-                .add(Keys.ITEM_DURABILITY, durability)
                 .build();
 
-        ArrayList<Dialogue> dialogueList = new ArrayList<>();
-        dialogueList.add(
-                Dialogue.builder()
-                        .setName("")
-                        .setText("You received " +
-                                (startsWithVowel(itemType.getName()) ? "an " : "a ") +
-
-                                //itemname without minecraft: or pixelmon:
-                                itemType.getName().substring(itemType.getName().indexOf(":") + 1)
-                                + "!")
-                        .build()
-        );
-
-        logger.info("Giving item '{}' to player '{}'", itemStack.getItem(), player.getName());
-
-        Dialogue.setPlayerDialogueData((EntityPlayerMP) player, dialogueList, true);
         player.getInventory().offer(itemStack);
-        player.playSound(sound, player.getLocation().getPosition(), 50, 1);
 
-        logger.info("Giving item {} was successful", itemType.getName());
+        player.playSound(sound, player.getLocation().getPosition(), 50, 1);
+        ArrayList<Dialogue> dialogueList = new ArrayList<>();
+
+        synchronized (this) {
+            dialogueList.add(
+                    Dialogue.builder()
+                            .setName(" ")
+                            .setText("You received " +
+                                    (startsWithVowel(itemType.getName()) ? "an " : "a ") +
+
+                                    //itemname without minecraft: or pixelmon:
+                                    itemType.getName().substring(itemType.getName().indexOf(":") + 1)
+                                    + "!")
+                            .build()
+            );
+            Dialogue.setPlayerDialogueData((EntityPlayerMP) player, dialogueList, true);
+        }
     }
 
     private boolean startsWithVowel(String string) {
