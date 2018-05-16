@@ -35,9 +35,9 @@ public class ItemPickupRevealer {
 
         public Revealer(TriggerService triggerService) {
             this.locations = triggerService.getAll().stream()
-                    .filter(trigger -> trigger.getActions().stream().anyMatch(action -> action instanceof GiveItemAction))
+                    .filter(trigger -> trigger.getActions().stream().anyMatch(GiveItemAction.class::isInstance))
                     .flatMap(trigger -> trigger.getConditions().stream())
-                    .filter(condition -> condition instanceof IPositioned)
+                    .filter(IPositioned.class::isInstance)
                     .map(IPositioned.class::cast)
                     .map(IPositioned::getLocation)
                     .collect(Collectors.toList());
