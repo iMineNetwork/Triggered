@@ -2,13 +2,15 @@ package com.imine.pixelmon.trigger.condition;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.imine.pixelmon.trigger.requirement.Requirement;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import java.util.List;
 import java.util.Optional;
 
-public class BlockInteractCondition extends Condition {
+public class BlockInteractCondition extends Condition implements IPositioned {
 
     private int x, y, z;
     private String world;
@@ -31,5 +33,17 @@ public class BlockInteractCondition extends Condition {
                     && this.world.equals(worldLocation.getExtent().getName());
         }
         return false;
+    }
+
+    @Override
+    public Location getLocation() {
+        Location location = null;
+        Optional<World> optionalWorld = Sponge.getServer().getWorld(world);
+
+        if (optionalWorld.isPresent()) {
+            location = new Location(optionalWorld.get(), x, y, z);
+        }
+
+        return location;
     }
 }

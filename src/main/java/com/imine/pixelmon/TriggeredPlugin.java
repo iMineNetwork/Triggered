@@ -1,5 +1,6 @@
 package com.imine.pixelmon;
 
+import com.imine.pixelmon.component.ItemPickupRevealer;
 import com.imine.pixelmon.event.PixelmonListener;
 import com.imine.pixelmon.event.TriggerEventListener;
 import com.imine.pixelmon.service.PlayerTriggerActivationService;
@@ -56,6 +57,7 @@ public class TriggeredPlugin {
         Sponge.getGame().getEventManager().registerListeners(this, new TriggerEventListener(triggerService, playerTriggerActivationService));
         pixelmonListener = new PixelmonListener(triggerService, playerTriggerActivationService);
         Pixelmon.EVENT_BUS.register(pixelmonListener);
+        ItemPickupRevealer.init(this, triggerService);
     }
 
     private void stopPlugin() {
