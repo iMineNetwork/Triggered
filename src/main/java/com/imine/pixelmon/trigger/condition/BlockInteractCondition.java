@@ -37,13 +37,8 @@ public class BlockInteractCondition extends Condition implements IPositioned {
 
     @Override
     public Location getLocation() {
-        Location location = null;
-        Optional<World> optionalWorld = Sponge.getServer().getWorld(world);
-
-        if (optionalWorld.isPresent()) {
-            location = new Location(optionalWorld.get(), x, y, z);
-        }
-
-        return location;
+        return Sponge.getServer().getWorld(world)
+                .map(world -> new Location(world, x, y, z))
+                .orElse(null);
     }
 }
