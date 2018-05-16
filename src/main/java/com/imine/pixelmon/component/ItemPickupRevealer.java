@@ -17,6 +17,7 @@ import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ItemPickupRevealer {
 
@@ -30,29 +31,16 @@ public class ItemPickupRevealer {
 
     private static class Revealer implements Runnable {
 
-        List<Location> locations = new ArrayList<>();
+        List<Location> locations;
 
         public Revealer(TriggerService triggerService) {
-
-
-            for (Trigger trigger : triggerService.getAll()) {
-                boolean hasGiveItem = false;
-                for (Action action : trigger.getActions()) {
-                    if (action instanceof GiveItemAction) {
-                        hasGiveItem = true;
-                    }
-                }
-                if (!hasGiveItem) {
-                    continue;
-                }
-
-                for (Condition condition : trigger.getConditions()) {
-                    if (condition instanceof IPositioned) {
-                        locations.add(((IPositioned) condition).getLocation());
-                    }
-                }
-            }
-
+            this.locations = triggerService.getAll().stream()
+                    .filter(trigger -> trigger.getActions().stream().anyMatch(action -> action instanceof GiveItemAction))
+                    .flatMap(trigger -> trigger.getConditions().stream())
+                    .filter(condition -> condition instanceof IPositioned)
+                    .map(IPositioned.class::cast)
+                    .map(IPositioned::getLocation)
+                    .collect(Collectors.toList());
         }
 
         @Override
