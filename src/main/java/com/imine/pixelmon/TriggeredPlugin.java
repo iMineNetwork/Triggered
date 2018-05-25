@@ -13,12 +13,13 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
+import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
 
 import javax.inject.Inject;
 import java.nio.file.Path;
 
-@Plugin(id = "triggered", name = "Triggered", version = "1.0", description = "Create events with Conditions and Actions")
+@Plugin(id = "triggered", name = "Triggered", version = "1.0", description = "Create events with Conditions and Actions", dependencies = @Dependency(id="packingmule"))
 public class TriggeredPlugin {
 
     private static Object pluginInstance;
