@@ -26,7 +26,7 @@ public class GiveItemAction implements Action {
     private static final Logger logger = LoggerFactory.getLogger(GiveItemAction.class);
     private static SoundType sound = SoundType.of("custom.itemget");
 
-    private final ItemType itemType;
+    private final String itemType;
     private final int amount;
     private final boolean unbreakable;
     private final int durability;
@@ -36,53 +36,18 @@ public class GiveItemAction implements Action {
                           @JsonProperty("amount") int amount,
                           @JsonProperty("unbreakable") boolean unbreakable,
                           @JsonProperty("durability") int durability) {
-
-        Optional<ItemType> oItemType = Sponge.getGame().getRegistry().getType(ItemType.class, itemType);
-
         this.amount = amount > 0 ? amount : 1;
         this.unbreakable = unbreakable;
         this.durability = durability;
-
-        if (oItemType.isPresent()) {
-            this.itemType = oItemType.get();
-        } else {
-            this.itemType = ItemTypes.STICK;
-            logger.warn("No item found with type " + itemType);
-            return;
-        }
-
-
+        this.itemType = itemType;
     }
 
     @Override
     public void perform(Player player) {
-        ItemStack itemStack = ItemStack.builder()
-                .itemType(itemType)
-                .quantity(amount)
-                .add(Keys.UNBREAKABLE, unbreakable)
-                .build();
-
-        GiveItemAPI.getGiveItemAPI().giveItemToPlayer(player, itemStack);
+        GiveItemAPI.getGiveItemAPI().giveItemToPlayer(player, itemType);
 
         player.playSound(sound, player.getLocation().getPosition(), 50, 1);
         ArrayList<Dialogue> dialogueList = new ArrayList<>();
-
-        Task.builder().execute(() -> sendDialogueToPlayer((EntityPlayerMP) player, dialogueList)).submit(TriggeredPlugin.getPluginInstance());
-    }
-
-    private void sendDialogueToPlayer(EntityPlayerMP player, ArrayList<Dialogue> dialogueList) {
-        dialogueList.add(
-                Dialogue.builder()
-                        .setName(" ")
-                        .setText("You received " +
-                                (startsWithVowel(itemType.getName()) ? "an " : "a ") +
-
-                                //itemname without minecraft: or pixelmon:
-                                itemType.getName().substring(itemType.getName().indexOf(":") + 1)
-                                + "!")
-                        .build()
-        );
-        Dialogue.setPlayerDialogueData(player, dialogueList, true);
     }
 
     private boolean startsWithVowel(String string) {
