@@ -40,7 +40,7 @@ public class PixelmonListener {
 
     private boolean shouldTriggerRunForPlayer(Trigger trigger, Player player) {
         return Interval.ALWAYS.equals(trigger.getRepeat())
-                || playerTriggerActivationService.loadAll().stream()
+                || playerTriggerActivationService.getAll().stream()
                 .noneMatch(playerTriggerActivation -> playerTriggerActivation.getPlayerId().equals(player.getUniqueId())
                         && playerTriggerActivation.getTriggerId().equals(trigger.getId()));
     }

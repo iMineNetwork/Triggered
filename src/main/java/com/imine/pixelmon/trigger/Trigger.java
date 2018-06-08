@@ -4,6 +4,7 @@ import com.imine.pixelmon.trigger.action.Action;
 import com.imine.pixelmon.trigger.condition.Condition;
 
 import java.util.List;
+import java.util.Objects;
 
 public class Trigger {
 
