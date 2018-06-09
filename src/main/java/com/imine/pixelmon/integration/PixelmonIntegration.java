@@ -17,6 +17,12 @@ public class PixelmonIntegration {
 
     private static final Logger logger = LoggerFactory.getLogger(PixelmonIntegration.class);
 
+    public static int getPixelmonRegisteredInPokedexAsCaught(Player player) {
+        return PixelmonStorage.pokeBallManager.getPlayerStorage(getEntityMPPlayer(player.getUniqueId()))
+                .map(playerStorage -> playerStorage.pokedex.countCaught())
+                .orElse(0);
+    }
+
     public static boolean hasPlayerRegisteredPixelmonAsCaughtInPokedex(Player player, int id) {
         Optional<PlayerStorage> oPlayerStorage = PixelmonStorage.pokeBallManager.getPlayerStorage(getEntityMPPlayer(player.getUniqueId()));
         return oPlayerStorage.map(playerStorage -> playerStorage.pokedex.hasCaught(id)).orElse(false);
