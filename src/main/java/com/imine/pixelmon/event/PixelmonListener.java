@@ -1,22 +1,21 @@
 package com.imine.pixelmon.event;
 
+import com.imine.pixelmon.component.DialogueHandler;
 import com.imine.pixelmon.model.PlayerTriggerActivation;
 import com.imine.pixelmon.service.PlayerTriggerActivationService;
 import com.imine.pixelmon.service.TriggerService;
 import com.imine.pixelmon.trigger.Interval;
 import com.imine.pixelmon.trigger.Trigger;
 import com.imine.pixelmon.trigger.action.Action;
-import com.imine.pixelmon.trigger.condition.AreaCondition;
 import com.imine.pixelmon.trigger.condition.Condition;
 import com.imine.pixelmon.trigger.condition.battle.PlayerBattleEndCondition;
 import com.pixelmonmod.pixelmon.api.events.battles.BattleEndEvent;
+import com.pixelmonmod.pixelmon.api.events.dialogue.DialogueEndedEvent;
 import com.pixelmonmod.pixelmon.battles.controller.participants.BattleParticipant;
 import com.pixelmonmod.pixelmon.enums.battle.BattleResults;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 
-import java.util.List;
 import java.util.Set;
 
 public class PixelmonListener {
@@ -36,6 +35,11 @@ public class PixelmonListener {
                 handleBattleEndForPlayer((Player) k.getEntity(), battleEndEvent.results.keySet(), v);
             }
         });
+    }
+
+    @SubscribeEvent
+    public void onDialogueCloseEvent(DialogueEndedEvent dialogueEndedEvent) {
+        DialogueHandler.getInstance().handleCloseForPlayer((Player) dialogueEndedEvent.player);
     }
 
     private boolean shouldTriggerRunForPlayer(Trigger trigger, Player player) {

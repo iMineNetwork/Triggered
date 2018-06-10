@@ -2,23 +2,23 @@ package com.imine.pixelmon.trigger.action;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.pixelmonmod.pixelmon.api.dialogue.Choice;
+import com.imine.pixelmon.component.DialogueHandler;
 import com.pixelmonmod.pixelmon.api.dialogue.Dialogue;
-import net.minecraft.entity.player.EntityPlayerMP;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.spongepowered.api.entity.living.player.Player;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class DialogueAction extends ContextAction {
 
     private final List<DialogueEntry> dialogueEntries;
+    private final List<Action> closeActions;
 
     @JsonCreator
-    public DialogueAction(@JsonProperty("dialogueEntries") List<DialogueEntry> dialogueEntries) {
+    public DialogueAction(@JsonProperty("dialogueEntries") List<DialogueEntry> dialogueEntries, @JsonProperty("closeActions") List<Action> closeActions) {
         this.dialogueEntries = dialogueEntries;
+        this.closeActions = closeActions;
     }
 
     public List<DialogueEntry> getDialogueEntries() {
@@ -27,13 +27,13 @@ public class DialogueAction extends ContextAction {
 
     @Override
     public void perform(Player player) {
-        ArrayList<Dialogue> dialogueList = dialogueEntries.stream()
+        List<Dialogue> dialogueList = dialogueEntries.stream()
                 .map(dialogueEntry -> Dialogue.builder()
                         .setName(StrSubstitutor.replace(dialogueEntry.getName(), buildContext(player)))
                         .setText(StrSubstitutor.replace(dialogueEntry.getMessage(), buildContext(player)))
                         .build())
-                .collect(Collectors.toCollection(ArrayList::new));
-        Dialogue.setPlayerDialogueData((EntityPlayerMP) player, dialogueList, true);
+                .collect(Collectors.toList());
+        DialogueHandler.getInstance().openDialogueForPlayer(player, dialogueList, closeActions);
     }
 
     public static class DialogueEntry {
