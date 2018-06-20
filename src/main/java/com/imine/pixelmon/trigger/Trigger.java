@@ -5,26 +5,24 @@ import com.imine.pixelmon.trigger.condition.Condition;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class Trigger {
 
-    //The ID of the Trigger. Used for storing if a player has triggered it already
     private String id;
-
-    //Triggers will be activated once at least one of these conditions has been met.
     private List<Condition> conditions;
-    //All these actions will occur when the trigger activates
     private List<Action> actions;
-
     private Interval repeat;
+    private Cooldown cooldown;
 
     public Trigger() {
     }
 
-    public Trigger(String id, List<Condition> conditions, List<Action> actions, Interval repeat) {
+    public Trigger(String id, List<Condition> conditions, List<Action> actions, Interval repeat, Cooldown cooldown) {
         this.conditions = conditions;
         this.actions = actions;
         this.repeat = repeat;
+        this.cooldown = cooldown;
     }
 
     public String getId() {
@@ -57,6 +55,14 @@ public class Trigger {
 
     public void setRepeat(Interval repeat) {
         this.repeat = repeat;
+    }
+
+    public Optional<Cooldown> getCooldown() {
+        return Optional.ofNullable(cooldown);
+    }
+
+    public void setCooldown(Cooldown cooldown) {
+        this.cooldown = cooldown;
     }
 
     @Override

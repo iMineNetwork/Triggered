@@ -1,12 +1,11 @@
 package com.imine.pixelmon.event;
 
 import com.imine.pixelmon.component.DialogueHandler;
-import com.imine.pixelmon.model.PlayerTriggerActivation;
+import com.imine.pixelmon.component.TriggerActivator;
 import com.imine.pixelmon.service.PlayerTriggerActivationService;
 import com.imine.pixelmon.service.TriggerService;
 import com.imine.pixelmon.trigger.Interval;
 import com.imine.pixelmon.trigger.Trigger;
-import com.imine.pixelmon.trigger.action.Action;
 import com.imine.pixelmon.trigger.condition.Condition;
 import com.imine.pixelmon.trigger.condition.battle.PlayerBattleEndCondition;
 import com.pixelmonmod.pixelmon.api.events.battles.BattleEndEvent;
@@ -22,10 +21,12 @@ public class PixelmonListener {
 
     private final TriggerService triggerService;
     private final PlayerTriggerActivationService playerTriggerActivationService;
+    private final TriggerActivator triggerActivator;
 
-    public PixelmonListener(TriggerService triggerService, PlayerTriggerActivationService playerTriggerActivationService) {
+    public PixelmonListener(TriggerService triggerService, PlayerTriggerActivationService playerTriggerActivationService, TriggerActivator triggerActivator) {
         this.triggerService = triggerService;
         this.playerTriggerActivationService = playerTriggerActivationService;
+        this.triggerActivator = triggerActivator;
     }
 
     @SubscribeEvent
@@ -56,12 +57,7 @@ public class PixelmonListener {
                     if (condition instanceof PlayerBattleEndCondition) {
                         if (((PlayerBattleEndCondition) condition).matchesCondition(player, participants, resultForPlayer)) {
                             if (condition.matchesRequirements(player)) {
-                                for (Action action : trigger.getActions()) {
-                                    action.perform(player);
-                                    if (trigger.getRepeat().equals(Interval.ONCE)) {
-                                        playerTriggerActivationService.add(new PlayerTriggerActivation(player.getUniqueId(), trigger.getId()));
-                                    }
-                                }
+                                triggerActivator.activateTriggerForPlayer(trigger, player);
                                 break;
                             }
                         }

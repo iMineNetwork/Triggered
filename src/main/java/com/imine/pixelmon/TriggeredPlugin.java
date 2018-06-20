@@ -1,6 +1,8 @@
 package com.imine.pixelmon;
 
+import com.imine.pixelmon.component.GlobalCooldownHandler;
 import com.imine.pixelmon.component.ItemPickupRevealer;
+import com.imine.pixelmon.component.TriggerActivator;
 import com.imine.pixelmon.event.PixelmonListener;
 import com.imine.pixelmon.event.TriggerEventListener;
 import com.imine.pixelmon.service.PlayerTriggerActivationService;
@@ -55,8 +57,10 @@ public class TriggeredPlugin {
         playerTriggerActivationService = new PlayerTriggerActivationService(configPath.resolve("trigger_activations.json"));
         playerTriggerActivationService.loadAll();
         TriggerActivationRequirement.setPlayerTriggerActivationService(playerTriggerActivationService);
-        Sponge.getGame().getEventManager().registerListeners(this, new TriggerEventListener(triggerService, playerTriggerActivationService));
-        pixelmonListener = new PixelmonListener(triggerService, playerTriggerActivationService);
+        GlobalCooldownHandler globalCooldownHandler = new GlobalCooldownHandler();
+        TriggerActivator triggerActivator = new TriggerActivator(globalCooldownHandler, playerTriggerActivationService);
+        Sponge.getGame().getEventManager().registerListeners(this, new TriggerEventListener(triggerService, playerTriggerActivationService, triggerActivator));
+        pixelmonListener = new PixelmonListener(triggerService, playerTriggerActivationService, triggerActivator);
         Pixelmon.EVENT_BUS.register(pixelmonListener);
         new ItemPickupRevealer().init(this, triggerService, playerTriggerActivationService);
     }

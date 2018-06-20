@@ -1,5 +1,6 @@
 package com.imine.pixelmon.event;
 
+import com.imine.pixelmon.component.TriggerActivator;
 import com.imine.pixelmon.model.PlayerTriggerActivation;
 import com.imine.pixelmon.service.PlayerTriggerActivationService;
 import com.imine.pixelmon.service.TriggerService;
@@ -21,10 +22,12 @@ public class TriggerEventListener {
 
     private final TriggerService triggerService;
     private final PlayerTriggerActivationService playerTriggerActivationService;
+    private final TriggerActivator triggerActivator;
 
-    public TriggerEventListener(TriggerService triggerService, PlayerTriggerActivationService playerTriggerActivationService) {
+    public TriggerEventListener(TriggerService triggerService, PlayerTriggerActivationService playerTriggerActivationService, TriggerActivator triggerActivator) {
         this.triggerService = triggerService;
         this.playerTriggerActivationService = playerTriggerActivationService;
+        this.triggerActivator = triggerActivator;
     }
 
     @Listener(order = Order.LATE)
@@ -37,12 +40,7 @@ public class TriggerEventListener {
                         if (condition instanceof AreaCondition) {
                             if (condition.matchesRequirements(player)) {
                                 if (isEnteringTrigger((AreaCondition) condition, moveEntityEvent)) {
-                                    for (Action action : trigger.getActions()) {
-                                        action.perform(player);
-                                        if (trigger.getRepeat().equals(Interval.ONCE)) {
-                                            playerTriggerActivationService.add(new PlayerTriggerActivation(player.getUniqueId(), trigger.getId()));
-                                        }
-                                    }
+                                    triggerActivator.activateTriggerForPlayer(trigger, player);
                                     break;
                                 }
                             }
@@ -64,10 +62,7 @@ public class TriggerEventListener {
                             .map(EntityInteractCondition.class::cast)
                             .forEach(condition -> {
                                 if (condition.entityMatches(interactEntityEvent.getTargetEntity()) && condition.matchesRequirements(player)) {
-                                    trigger.getActions().forEach(action -> action.perform(player));
-                                    if (trigger.getRepeat().equals(Interval.ONCE)) {
-                                        playerTriggerActivationService.add(new PlayerTriggerActivation(player.getUniqueId(), trigger.getId()));
-                                    }
+                                    triggerActivator.activateTriggerForPlayer(trigger, player);
                                 }
                             }));
         });
@@ -85,10 +80,7 @@ public class TriggerEventListener {
                             .map(BlockInteractCondition.class::cast)
                             .forEach(condition -> {
                                 if (condition.blockMatches(interactBlockEvent.getTargetBlock()) && condition.matchesRequirements(player)) {
-                                    trigger.getActions().forEach(action -> action.perform(player));
-                                    if (trigger.getRepeat().equals(Interval.ONCE)) {
-                                        playerTriggerActivationService.add(new PlayerTriggerActivation(player.getUniqueId(), trigger.getId()));
-                                    }
+                                    triggerActivator.activateTriggerForPlayer(trigger, player);
                                 }
                             }));
         });
