@@ -93,9 +93,7 @@ public class AbstractJsonService<T> {
     protected ObjectMapper createObjectMapper() {
         if (objectMapper == null) {
             objectMapper = new ObjectMapper();
-            objectMapper.enable(JsonGenerator.Feature.IGNORE_UNKNOWN);
-            objectMapper.enable(JsonParser.Feature.IGNORE_UNDEFINED);
-            objectMapper.enable(JsonParser.Feature.ALLOW_MISSING_VALUES);
+            objectMapper.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
             objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
             SimpleModule module = new SimpleModule();
             module.addSerializer(Vector3d.class, new Vector3dSerializer());
@@ -107,7 +105,6 @@ public class AbstractJsonService<T> {
             module.addDeserializer(Attack.class, new AttackDeserializer());
             module.addDeserializer(PokemonSpec.class, new PokemonSpecDeserializer());
             objectMapper.registerModule(module);
-            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         }
         return objectMapper;
     }
