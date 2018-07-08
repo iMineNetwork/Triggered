@@ -1,9 +1,11 @@
 package com.imine.pixelmon.component;
 
+import com.imine.pixelmon.TriggeredPlugin;
 import com.imine.pixelmon.trigger.action.Action;
 import com.pixelmonmod.pixelmon.api.dialogue.Dialogue;
 import net.minecraft.entity.player.EntityPlayerMP;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.scheduler.Task;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,10 +30,13 @@ public class DialogueHandler {
     }
 
     public void openDialogueForPlayer(Player player, List<Dialogue> dialogueList, List<Action> actions) {
-        Dialogue.setPlayerDialogueData((EntityPlayerMP) player, dialogueList, true);
-        if (actions != null && !actions.isEmpty()) {
-            playerDialogueCloseActions.put(player.getUniqueId(), actions);
-        }
+        Task.builder().delayTicks(1).execute(() -> {
+            Dialogue.setPlayerDialogueData((EntityPlayerMP) player, dialogueList, true);
+            if (actions != null && !actions.isEmpty()) {
+                playerDialogueCloseActions.put(player.getUniqueId(), actions);
+            }
+        }).submit(TriggeredPlugin.getPluginInstance());
+
     }
 
     public void handleCloseForPlayer(Player player) {
